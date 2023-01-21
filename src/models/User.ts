@@ -1,39 +1,22 @@
-interface UserProps {
+import { ApiSync } from './ApiSync';
+import { Attributes } from './Attributes';
+import { Eventing } from './Eventing';
+import { Model } from './Model';
+
+export interface UserProps {
+  id?: number;
   name: string;
   age: number;
 }
 
-type Callback = () => void;
+const rootUrl = 'http://localhost:3000/users'
 
-export class User {
-  private events: { [key: string]: Callback[] } = {};
-
-  constructor(private props: UserProps) { }
-
-  get(propName: string): string | number {
-    return this.props[propName];
-  }
-
-  set(update: Partial<UserProps>): void {
-    this.props = {
-      ...this.props,
-      ...update
-    }
-  }
-
-  on(eventName: string, callback: Callback): void {
-    const handlers = this.events[eventName] || [];
-    handlers.push(callback);
-    this.events[eventName] = handlers;
-  }
-
-  trigger(eventName: string): void {
-    const handlers = this.events[eventName];
-
-    if (!handlers || !handlers.length) {
-      return;
-    }
-
-    handlers.forEach(callback => callback());
+export class User extends Model<UserProps> {
+  static build(attrs: UserProps): User {
+    return new User(
+      new Attributes<UserProps>(attrs),
+      new Eventing(),
+      new ApiSync<UserProps>(rootUrl)
+    )
   }
 }
