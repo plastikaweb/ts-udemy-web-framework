@@ -1,7 +1,7 @@
 import { AxiosPromise, AxiosResponse } from 'axios';
 
 interface ModelAttributes<T> {
-  set(update: T): void;
+  set(update: Partial<T>): void;
   getAll(): T;
   get<K extends keyof T>(key: K): T[K];
 }
@@ -32,7 +32,7 @@ export class Model<T extends HasId> {
   get = this.attributes.get;
 
 
-  set(update: T): void {
+  set(update: Partial<T>): void {
     this.attributes.set(update);
     this.events.trigger('change');
   }
